@@ -1,7 +1,7 @@
-# connect4
+# Connect4
 Implementation of minimax for a Connect4 game.
 
-## FOR IMPROVEMENT
+### FOR IMPROVEMENT
 - Comment the code and refactor
 - Rewrite/improve the evaluate function
 - Make some kind of GUI for it
