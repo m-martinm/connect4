@@ -1,8 +1,7 @@
 #ifndef CONNECT_H
 #define CONNECT_H
+
 #include <stdbool.h>
-#include <stdio.h>
-#include <math.h>
 #define ROWS 6
 #define COLS 7
 
