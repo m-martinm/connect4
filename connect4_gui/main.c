@@ -74,7 +74,9 @@ void titleScreen(GameScreen *gamestate){
 
             ClearBackground(LIGHTGRAY);
             DrawText("PRESS [ENTER] TO START", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO START", 40)/2, GetScreenHeight()/2 - 50, 40, DARKGRAY);
-            DrawText("\n\n\nRules:\n - You have to connect 4 dots in any way\n - Your dots always fall to the bottom\n - Just [click] on the column to place your circle there", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO START", 40)/2, GetScreenHeight()/2 - 50, 20, DARKGRAY);
+            DrawText("\n\n\nRules:\n - You have to connect 4 dots in any way\n 
+                     - Your dots always fall to the bottom\n - Just [click] on the column to place your circle there",
+                     GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO START", 40)/2, GetScreenHeight()/2 - 50, 20, DARKGRAY);
 
         EndDrawing();
     }
