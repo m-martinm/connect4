@@ -22,6 +22,7 @@ int checkCol(state board[ROWS][COLS], int startRow, int startCol);
 int checkDiag(state board[ROWS][COLS], int startRow, int startCol);
 int checkDiagb(state board[ROWS][COLS], int startRow, int startCol);
 int win(state board[ROWS][COLS]);
+bool boardFull(state board[ROWS][COLS]);
 void legalmoves(state board[ROWS][COLS], position moves[COLS]);
 int minmax(state arr[ROWS][COLS], int isMaximizing, int depth, int alpha, int beta);
 position findBestmove(state arr[ROWS][COLS]);
