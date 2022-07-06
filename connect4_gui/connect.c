@@ -3,11 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
 #define ROWS 6
 #define COLS 7
-#define CLEAR "\e[1;1H\e[2J"
 
 bool inInterval(int x, int min, int max){ // inclusive
     if(x <= max && x >= min){
@@ -67,7 +65,7 @@ int checkDiagb(state board[ROWS][COLS], int startRow, int startCol){
 bool boardFull(state board[ROWS][COLS]){
     for(int i = 0; i < ROWS; i++){
         for(int j = 0; j < COLS; j++){
-            if(board[i][j] != EMPTY){
+            if(board[i][j] == EMPTY){
                 return false;
             }
         }
@@ -76,8 +74,7 @@ bool boardFull(state board[ROWS][COLS]){
 }
 
 int win(state board[ROWS][COLS]){
-    if(boardFull(board)) return -1;
-    for(int i = ROWS; i >= 0; i--){
+    for(int i = ROWS-1; i >= 0; i--){
         for(int j = 0; j < COLS; j++){
             if(board[i][j] != EMPTY){
                 if(checkCol(board, i, j) == 4 || checkRow(board, i, j) == 4 || checkDiag(board, i, j) == 4 || checkDiagb(board, i,j) == 4){
@@ -93,6 +90,7 @@ int win(state board[ROWS][COLS]){
             }
         }
     }
+    if(boardFull(board)) return -1;
     return 0;
 }
 
@@ -118,8 +116,8 @@ int newevaluate(state arr[ROWS][COLS]){
     else if(won == 1) return -100;
     else if(won == -1) return 0;
 
-    int blockP = 0, threeP = 0, twoP = 0; 
-    int blockC = 0, threeC = 0, twoC = 0;
+    int blockP = 0, threeP = 0, twoP = 0, blockP2 = 0; 
+    int blockC = 0, threeC = 0, twoC = 0, blockC2 = 0;
 
     for(int i = ROWS-1; i >= 0; i--){
         for(int j = 0; j < COLS ; j++){
@@ -128,77 +126,73 @@ int newevaluate(state arr[ROWS][COLS]){
                     threeC++;
                     if(arr[i-3][j+3] == PLAYER) blockP++;
                 }
-                else if(checkDiag(arr, i, j) == 2) twoC++;
+                else if(checkDiag(arr, i, j) == 2){
+                    twoC++;
+                    if(arr[i-2][i+2] == PLAYER) blockP2++;
+                }
                 if(checkDiagb(arr, i, j) == 3){
                     threeC++;
                     if(arr[i-3][j-3] == PLAYER) blockP++;
                 }
-                else if(checkDiagb(arr, i, j) == 2) twoC++;
+                else if(checkDiagb(arr, i, j) == 2){
+                    twoC++;
+                    if(arr[i-2][j-2] == PLAYER) blockP2++;
+                }
                 if(checkRow(arr, i, j) == 3){
                     threeC++;
                     if(arr[i][j+3] == PLAYER) blockP++;
                 }
-                else if(checkRow(arr, i, j) == 2) twoC++;
-                if(checkDiag(arr, i, j) == 3){
+                else if(checkRow(arr, i, j) == 2){
+                    twoC++;
+                    if(arr[i][j+2] == PLAYER) blockP2++;
+                } 
+                if(checkCol(arr, i, j) == 3){
                     threeC++;
                     if(arr[i-3][j] == PLAYER) blockP++;
                 }
-                else if(checkCol(arr, i, j) == 2) twoC++;
+                else if(checkCol(arr, i, j) == 2){
+                    twoC++;
+                    if(arr[i-2][j] == PLAYER) blockP2++;
+                }
             }
             else if(arr[i][j] == PLAYER){
                 if(checkDiag(arr, i, j) == 3){
                     threeP++;
                     if(arr[i-3][j+3] == COMP) blockC++;
                 }
-                else if(checkDiag(arr, i, j) == 2) twoP++;
+                else if(checkDiag(arr, i, j) == 2){
+                    twoP++;
+                    if(arr[i-2][j+2] == COMP) blockC2++;
+                }
                 if(checkDiagb(arr, i, j) == 3){
                     threeP++;
                     if(arr[i-3][j-3] == COMP) blockC++;
                 }
-                else if(checkDiagb(arr, i, j) == 2) twoP++;
+                else if(checkDiagb(arr, i, j) == 2){
+                    twoP++;
+                    if(arr[i-2][j-2] == COMP) blockC2++;
+                }
                 if(checkRow(arr, i, j) == 3){
                     threeP++;
                     if(arr[i][j+3] == COMP) blockC++;
                 }
-                else if(checkRow(arr, i, j) == 2) twoP++;
-                if(checkDiag(arr, i, j) == 3){
+                else if(checkRow(arr, i, j) == 2){
+                    twoP++;
+                    if(arr[i][j+2] == COMP) blockC2++;
+                }
+                if(checkCol(arr, i, j) == 3){
                     threeP++;
                     if(arr[i-3][j] == COMP) blockC++;
                 }
-                else if(checkCol(arr, i, j) == 2) twoP++;
+                else if(checkCol(arr, i, j) == 2){
+                    twoP++;
+                    if(arr[i-2][j] == COMP) blockC2++;
+                } 
             }
         }
     }
-    int ret = (2*blockC + 2*threeC + twoC) - (2*blockP + 2*threeP + twoP);
+    int ret = (2*blockC2 + blockC + 2*threeC + twoC) - (2*blockP2 + blockP + 2*threeP + twoP);
     return ret;
-}
-
-int evaluate(state arr[ROWS][COLS]){
-    int tmp = win(arr);
-    int scoreP = 0;
-    int scoreC = 0;
-    if (tmp == 2) return 100;
-    else if (tmp == 1) return -100;
-    else if (tmp == -1) return 0;
-    else{
-        for(int i = ROWS-1; i >= 0; i--){
-            for(int j = 0; j < COLS ; j++){
-                if(arr[i][j] == PLAYER){
-                    scoreP += checkDiagb(arr, i, j);
-                    scoreP += checkCol(arr, i, j);
-                    scoreP += checkRow(arr, i, j);
-                    scoreP += checkDiag(arr, i, j);
-                }
-                else if(arr[i][j] == COMP){
-                    scoreC += checkDiagb(arr, i, j);
-                    scoreC += checkCol(arr, i, j);
-                    scoreC += checkRow(arr, i, j);
-                    scoreC += checkDiag(arr, i, j);
-                }
-            }
-        }
-    }
-    return scoreC - scoreP;
 }
 
 void legalmoves(state board[ROWS][COLS], position moves[COLS]){
@@ -217,12 +211,12 @@ void legalmoves(state board[ROWS][COLS], position moves[COLS]){
 }
 
 int minmax(state arr[ROWS][COLS], int isMaximizing, int depth, int alpha, int beta){
-// működik eval functiont tudod javítani
+
     int score = newevaluate(arr);
     if(score == -100 || score == 100 || depth > 7) return score;
     else if(boardFull(arr)) return 0;
 
-    position moves[COLS];
+    position moves[COLS];  
     memset(moves, -1, sizeof(moves));
 
     if(isMaximizing){
@@ -234,7 +228,7 @@ int minmax(state arr[ROWS][COLS], int isMaximizing, int depth, int alpha, int be
                 int eval = minmax(arr, 0, depth + 1, alpha, beta);
                 best = max(best, eval);
                 arr[moves[i].row][moves[i].col] = EMPTY;
-                if(eval == 100) return eval;
+                // if(eval == 100) return eval;
                 alpha = max(alpha, eval);
                 if(beta <= alpha) break;
             }
@@ -251,7 +245,7 @@ int minmax(state arr[ROWS][COLS], int isMaximizing, int depth, int alpha, int be
                 int eval = minmax(arr, 1, depth + 1, alpha, beta);
                 best = min(best, eval);
                 arr[moves[i].row][moves[i].col] = EMPTY;
-                if(eval == -100) return eval;
+                // if(eval == -100) return eval;
                 beta = min(beta, eval);
                 if(beta <= alpha) break;
             }
@@ -278,7 +272,7 @@ position findBestmove(state arr[ROWS][COLS]){
                 bestVal = moveVal;
             }
             arr[moves[i].row][moves[i].col] = EMPTY;
-            if(bestVal == 100) return  bestMove;
+            // if(bestVal == 100) return  bestMove;
         } 
     }
     return bestMove;
