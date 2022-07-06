@@ -1,8 +1,6 @@
 #include "include/raylib.h"
 #include "include/connect.h"
-#include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <string.h>
 
 #define SC_WIDTH 800
@@ -18,7 +16,6 @@ void computerTurn(GameScreen *gamestate, state board[ROWS][COLS]);
 void animate(int posX, int posY, state player, state board[ROWS][COLS]);
 void drawScore();
 void drawEnd(state board[ROWS][COLS]);
-void drawSelection(Vector2 mouse);
 
 int COMPSCORE = 0;
 int PLAYERSCORE = 0;
@@ -35,6 +32,7 @@ int main(void)
     UnloadImage(icon);
 
     state board[ROWS][COLS] = {0};
+    board[6][7] = COMP;
     GameScreen gamestate = TITLE;
 
     SetTargetFPS(60);
@@ -42,6 +40,7 @@ int main(void)
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
+        HideCursor();
         switch(gamestate){
             
             case TITLE: titleScreen(&gamestate);
@@ -63,8 +62,8 @@ int main(void)
 }
 
 void titleScreen(GameScreen *gamestate){
+
     while (!WindowShouldClose()){
-        
         if(IsKeyPressed(KEY_ENTER)){
             *gamestate = PLAYERTURN;
             return;
@@ -73,10 +72,8 @@ void titleScreen(GameScreen *gamestate){
         BeginDrawing();
 
             ClearBackground(LIGHTGRAY);
-            DrawText("PRESS [ENTER] TO START", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO START", 40)/2, GetScreenHeight()/2 - 50, 40, DARKGRAY);
-            DrawText("\n\n\nRules:\n - You have to connect 4 dots in any way\n 
-                     - Your dots always fall to the bottom\n - Just [click] on the column to place your circle there",
-                     GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO START", 40)/2, GetScreenHeight()/2 - 50, 20, DARKGRAY);
+            DrawText("PRESS [ENTER] TO START", SC_WIDTH/2 - MeasureText("PRESS [ENTER] TO START", 40)/2, SC_HEIGHT/2 - 50, 40, DARKGRAY);
+            DrawText("\n\n\nRules:\n - You have to connect 4 dots in any way\n - Your dots always fall to the bottom\n - Just [click] on the column to place your circle there", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO START", 40)/2, GetScreenHeight()/2 - 50, 20, DARKGRAY);
 
         EndDrawing();
     }
@@ -84,7 +81,7 @@ void titleScreen(GameScreen *gamestate){
 }
 
 void endScreen(GameScreen *gamestate, state board[ROWS][COLS]){
-    
+
     char text[128];
     if(win(board) == 1){
         strcpy(text, "PLAYER WON!");
@@ -94,12 +91,11 @@ void endScreen(GameScreen *gamestate, state board[ROWS][COLS]){
         strcpy(text, "COMPUTER WON!");
         COMPSCORE++;
     }
-    else {
+    else if(win(board) == -1){
         strcpy(text, "DRAW!");;
     }
 
     while (!WindowShouldClose()){
-        
         if(IsKeyPressed(KEY_ENTER)){
             memset(board, EMPTY, ROWS*COLS*(sizeof(board[0][0])));
             *gamestate = TITLE;
@@ -122,27 +118,28 @@ void endScreen(GameScreen *gamestate, state board[ROWS][COLS]){
 
 void playerTurn(GameScreen *gamestate, state board[ROWS][COLS]){
 
-    Vector2 mouse;
-    int col;
+    int col = 3;
+
     while (!WindowShouldClose()){
-        mouse = GetMousePosition();
+
+        Rectangle r = {.x = 50 + col*(SC_WIDTH - 100)/COLS, .y =  (SC_WIDTH-100)/COLS, .height = SC_HEIGHT-200, .width = (SC_WIDTH-100)/COLS};
         BeginDrawing();
 
             ClearBackground(LIGHTGRAY);
             DrawText("YOUR TURN", GetScreenWidth()/2 - MeasureText("YOUR TURN", 40)/2, 30, 40, DARKGRAY);
             renderBoard(board);
-            drawSelection(mouse);
+            DrawRectangleLinesEx(r, 5.0f, DARKPURPLE);
             drawScore();
 
         EndDrawing();
-        if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
-            if(mouse.x < 50 + (SC_WIDTH - 100)/COLS) col = 0;
-            else if(mouse.x < 50 + 2*(SC_WIDTH - 100)/COLS) col = 1;
-            else if(mouse.x < 50 + 3*(SC_WIDTH - 100)/COLS) col = 2;
-            else if(mouse.x < 50 + 4*(SC_WIDTH - 100)/COLS) col = 3;
-            else if(mouse.x < 50 + 5*(SC_WIDTH - 100)/COLS) col = 4;
-            else if(mouse.x < 50 + 6*(SC_WIDTH - 100)/COLS) col = 5;
-            else if(mouse.x < SC_WIDTH) col = 6;
+
+        if((IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) && col < COLS-1){
+            col++;
+        }
+        else if ((IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) && col > 0){
+            col--;
+        }
+        if(IsKeyPressed(KEY_SPACE)){
             if(board[0][col] == EMPTY){
                 for(int i = ROWS-1; i >= 0; i--){
                     if(board[i][col] == EMPTY){
@@ -153,7 +150,7 @@ void playerTurn(GameScreen *gamestate, state board[ROWS][COLS]){
                             return;
                         }
                         else{
-                            *gamestate = COMPUTERTURN;
+                            *gamestate = COMPUTERTURN; 
                             return;
                         }
                     }
@@ -177,7 +174,10 @@ void computerTurn(GameScreen *gamestate, state board[ROWS][COLS]){
     position temp = findBestmove(board);
     animate(50 + temp.col * (SC_WIDTH - 100)/COLS, 100 + temp.row*(SC_HEIGHT- 200)/ROWS, COMP, board);
     computermove(board, temp);
-    if(win(board)) *gamestate = ENDING;
+    if(win(board)){
+        *gamestate = ENDING;
+        return;
+    }
     else{
         *gamestate = PLAYERTURN;
     }
@@ -212,21 +212,11 @@ void animate(int posX, int posY, state player, state board[ROWS][COLS]){
         BeginDrawing();
 
             ClearBackground(LIGHTGRAY);
-
             renderBoard(board);
             DrawCircle(position.x+50, position.y+50, 48, color);
             drawScore();
 
         EndDrawing();
-    }
-}
-
-void copyBoard(state src[ROWS][COLS], state dst[ROWS][COLS]){
-    for (int i = 0; i < ROWS; i++)
-    {
-        for(int j = 0; j < COLS; j++){
-            dst[i][j] = src[i][j];
-        }
     }
 }
 
@@ -268,18 +258,4 @@ void drawEnd(state board[ROWS][COLS]){
             }
         }
     }
-
-}
-
-void drawSelection(Vector2 mouse){
-    int col;
-    if(mouse.x < 50 + (SC_WIDTH - 100)/COLS) col = 0;
-    else if(mouse.x < 50 + 2*(SC_WIDTH - 100)/COLS) col = 1;
-    else if(mouse.x < 50 + 3*(SC_WIDTH - 100)/COLS) col = 2;
-    else if(mouse.x < 50 + 4*(SC_WIDTH - 100)/COLS) col = 3;
-    else if(mouse.x < 50 + 5*(SC_WIDTH - 100)/COLS) col = 4;
-    else if(mouse.x < 50 + 6*(SC_WIDTH - 100)/COLS) col = 5;
-    else if(mouse.x < SC_WIDTH) col = 6;
-    Rectangle r = {.x = 50 + col*(SC_WIDTH - 100)/COLS, .y =  (SC_WIDTH-100)/COLS, .height = SC_HEIGHT-200, .width = (SC_WIDTH-100)/COLS};
-    DrawRectangleLinesEx(r, 5.0f, DARKPURPLE);
 }
