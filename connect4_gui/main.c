@@ -3,16 +3,20 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define CELLSIZE 100
+#define B_WIDTH (CELLSIZE*COLS)
+#define B_HEIGHT (CELLSIZE*ROWS)
+
 typedef enum GameScreen {TITLE, PLAYERTURN, COMPUTERTURN, ENDING} GameScreen;
 
 void titleScreen(Game_info *g);
-void renderBoard(state board[ROWS][COLS]);
+void renderBoard(const Game_info *g);
 void playerTurn(Game_info *g);
 void endScreen(Game_info *g);
-void computerTurn(GameScreen *gamestate, state board[ROWS][COLS]);
-void animate(int posX, int posY, state player, state board[ROWS][COLS]);
-void drawScore();
-void drawEnd(state board[ROWS][COLS]);
+void computerTurn(Game_info *g);
+void animate(int posX, int posY, state player, const state board[ROWS][COLS]);
+void drawScore(const Game_info *g);
+void drawEnd(const Game_info *g);
 
 int main(void)
 {
@@ -23,6 +27,7 @@ int main(void)
         .playerscore = 0,
         .screenHeight = 800,
         .screenWidth = 800,
+        .max_depth = 7
     };
     memset(game.board, 0, ROWS*COLS*sizeof(game.board[0][0]));
 
@@ -42,7 +47,7 @@ int main(void)
             
             case TITLE: titleScreen(&game);
                 break;
-            case PLAYERTURN: endScreen(&game);
+            case PLAYERTURN: playerTurn(&game);
                 break;
             case COMPUTERTURN: titleScreen(&game);
                 break;
@@ -102,8 +107,8 @@ void endScreen(Game_info *g){
         BeginDrawing();
 
             ClearBackground(LIGHTGRAY);
-            DrawText(text, g->screenWidth - MeasureText(text, g->screenHeight/20)/2, g->screenHeight/14, g->screenHeight/20, DARKGRAY);
-            DrawText("PRESS [ENTER] TO PLAY AGAIN", g->screenWidth - MeasureText("PRESS [ENTER] TO PLAY AGAIN", g->screenHeight/40)/2, g->screenHeight/27, g->screenHeight/40, DARKGRAY);
+            DrawText(text, g->screenWidth - MeasureText(text, 40)/2, (g->screenHeight - B_HEIGHT)/2 - 40, 40, DARKGRAY);
+            DrawText("PRESS [ENTER] TO PLAY AGAIN", g->screenWidth - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, (g->screenHeight - B_HEIGHT)/2 - 20, 20, DARKGRAY);
             renderBoard(g);
             drawEnd(g);
             drawScore();
@@ -119,12 +124,12 @@ void playerTurn(Game_info *g){
 
     while (!WindowShouldClose()){
 
-        Rectangle r = {.x = 50 + col*(SC_WIDTH - 100)/COLS, .y =  (SC_WIDTH-100)/COLS, .height = SC_HEIGHT-200, .width = (SC_WIDTH-100)/COLS};
+        Rectangle r = {.x = (g->screenWidth - B_WIDTH)/2 + col*CELLSIZE, .y = (g->screenHeight - B_HEIGHT)/2, .height = B_HEIGHT, .width = CELLSIZE};
         BeginDrawing();
 
             ClearBackground(LIGHTGRAY);
-            DrawText("YOUR TURN", GetScreenWidth()/2 - MeasureText("YOUR TURN", 40)/2, 30, 40, DARKGRAY);
-            renderBoard(board);
+            DrawText("YOUR TURN", g->screenWidth/2 - MeasureText("YOUR TURN", 40)/2, (g->screenHeight - B_HEIGHT)/2 - 40, 40, DARKGRAY);
+            renderBoard(g);
             DrawRectangleLinesEx(r, 5.0f, DARKPURPLE);
             drawScore();
 
@@ -137,17 +142,17 @@ void playerTurn(Game_info *g){
             col--;
         }
         if(IsKeyPressed(KEY_SPACE)){
-            if(board[0][col] == EMPTY){
+            if(g->board[0][col] == EMPTY){
                 for(int i = ROWS-1; i >= 0; i--){
-                    if(board[i][col] == EMPTY){
-                        animate(50 + col * (SC_WIDTH - 100)/COLS, 100 + i*(SC_HEIGHT- 200)/ROWS, PLAYER, board);
-                        board[i][col] = PLAYER;
-                        if(win(board)){
-                            *gamestate = ENDING;
+                    if(g->board[i][col] == EMPTY){
+                        animate((g->screenWidth - B_WIDTH)/2 + col*CELLSIZE, (g->screenHeight - B_HEIGHT)/2 + i*CELLSIZE, PLAYER, g->board);
+                        g->board[i][col] = PLAYER;
+                        if(win(g->board)){
+                            g->gamestate = ENDING;
                             return;
                         }
                         else{
-                            *gamestate = COMPUTERTURN; 
+                            g->gamestate = COMPUTERTURN; 
                             return;
                         }
                     }
@@ -158,38 +163,38 @@ void playerTurn(Game_info *g){
     CloseWindow();
 }
 
-void computerTurn(GameScreen *gamestate, state board[ROWS][COLS]){
+void computerTurn(Game_info *g){
 
     BeginDrawing();
 
             ClearBackground(LIGHTGRAY);
-            DrawText("WAIT FOR THE COMPUTER", GetScreenWidth()/2 - MeasureText("WAIT FOR THE COMPUTER", 40)/2, 30, 40, DARKGRAY);
-            renderBoard(board);
+            DrawText("WAIT FOR THE COMPUTER", g->screenWidth - MeasureText("WAIT FOR THE COMPUTER", 40)/2, (g->screenHeight - B_HEIGHT)/2 - 40, 40, DARKGRAY);
+            renderBoard(g);
             drawScore();
 
     EndDrawing();
-    position temp = findBestmove(board);
-    animate(50 + temp.col * (SC_WIDTH - 100)/COLS, 100 + temp.row*(SC_HEIGHT- 200)/ROWS, COMP, board);
-    computermove(board, temp);
-    if(win(board)){
-        *gamestate = ENDING;
+    position temp = findBestmove(g->board);
+    animate((g->screenWidth - B_WIDTH)/2 + temp.col*CELLSIZE, (g->screenHeight - B_HEIGHT)/2 + temp.row*CELLSIZE, COMP, g->board);
+    computermove(g->board, temp);
+    if(win(g->board)){
+        g->gamestate = ENDING;
         return;
     }
     else{
-        *gamestate = PLAYERTURN;
+        g->gamestate = PLAYERTURN;
     }
 }
 
-void renderBoard(state board[ROWS][COLS]){
+void renderBoard(const Game_info *g){
     for(int i = ROWS-1; i >=0; i--){
         for(int j = 0; j < COLS; j++){
-            int posX = 50 + j*(SC_WIDTH - 100)/COLS;
-            int posY = 100 + i*(SC_HEIGHT- 200)/ROWS;
-            DrawRectangleLines(posX, posY, (SC_WIDTH - 100)/COLS, (SC_HEIGHT-200)/ROWS, BLACK);
-            switch(board[i][j]){
-                case PLAYER: DrawCircle(posX+50, posY+50, 48, RED); 
+            int posX = (g->screenWidth - B_WIDTH)/2 + j*CELLSIZE;
+            int posY = (g->screenHeight - B_HEIGHT)/2 + i*CELLSIZE;
+            DrawRectangleLines(posX, posY, CELLSIZE, CELLSIZE, BLACK);
+            switch(g->board[i][j]){
+                case PLAYER: DrawCircle(posX+CELLSIZE/2, posY + CELLSIZE/2, CELLSIZE-4, RED); 
                     break;
-                case COMP: DrawCircle(posX+50, posY+50, 48, ORANGE); 
+                case COMP: DrawCircle(posX+CELLSIZE/2, posY+CELLSIZE/2, CELLSIZE-4, ORANGE); 
                     break;
                 default: continue;
                     break;
@@ -198,7 +203,7 @@ void renderBoard(state board[ROWS][COLS]){
     }
 }
 
-void animate(int posX, int posY, state player, state board[ROWS][COLS]){
+void animate(int posX, int posY, state player, const state board[ROWS][COLS]){
     Vector2 position= {.x = posX, .y = -100};
     Vector2 speed = { 0.0f, 25.0f };
     Color color;
@@ -210,44 +215,50 @@ void animate(int posX, int posY, state player, state board[ROWS][COLS]){
 
             ClearBackground(LIGHTGRAY);
             renderBoard(board);
-            DrawCircle(position.x+50, position.y+50, 48, color);
+            DrawCircle(position.x+CELLSIZE/2, position.y+CELLSIZE/2, CELLSIZE-4, color);
             drawScore();
 
         EndDrawing();
     }
 }
 
-void drawScore(){
+
+// this must be rewritten too
+void drawScore(const Game_info *g){
     char pscore[10];
     char cscore[10];
-    itoa(PLAYERSCORE, pscore, 10);
-    itoa(COMPSCORE, cscore, 10);
-    DrawCircle(40,47,30,Fade(RED, 0.5f));
-    DrawCircle(SC_WIDTH-40,47,30,Fade(YELLOW, 0.5f));
-    DrawText(pscore, 30, 30, 40, BLACK);
-    DrawText(cscore, SC_WIDTH - 30 - MeasureText(cscore, 40), 30, 40, BLACK);
+    itoa(g->playerscore, pscore, 10);
+    itoa(g->compscore, cscore, 10);
+    // DrawCircle(40,47,30,Fade(RED, 0.5f));
+    // DrawCircle(SC_WIDTH-40,47,30,Fade(YELLOW, 0.5f));
+    DrawText(pscore, 30, 30, 40, BLACK); // itt ezeket javítsd
+    DrawText(cscore, g->screenWidth - 30 - MeasureText(cscore, 40), 30, 40, BLACK);
 }
 
-void drawEnd(state board[ROWS][COLS]){
+
+// continue here
+void drawEnd(const Game_info *g){
     for(int i = ROWS-1; i >=0; i--){
         for(int j = 0; j < COLS; j++){
-            if(board[i][j] != EMPTY){
-                if (checkCol(board, i, j) == 4){
-                    Vector2 st = {.x = 100 + j*(SC_WIDTH - 100)/COLS, .y = 150 + i*(SC_HEIGHT- 200)/ROWS};
-                    Vector2 en = {.x = 100 + j*(SC_WIDTH - 100)/COLS, .y = 150 + (i-3)*(SC_HEIGHT- 200)/ROWS};
+            if(g->board[i][j] != EMPTY){
+                // int posX = (g->screenWidth - B_WIDTH)/2 + j*CELLSIZE + CELLSIZE/2;
+                // int posY = (g->screenWidth - B_WIDTH)/2 + (i-3)*CELLSIZE + CELLSIZE/2
+                if (checkCol(g->board, i, j) == 4){                    
+                    Vector2 st = {.x = (g->screenWidth - B_WIDTH)/2 + j*CELLSIZE + CELLSIZE/2, .y = (g->screenWidth - B_WIDTH)/2 + i*CELLSIZE + CELLSIZE/2;
+                    Vector2 en = {.x = (g->screenWidth - B_WIDTH)/2 + j*CELLSIZE + CELLSIZE/2, .y = (g->screenWidth - B_WIDTH)/2 + (i-3)*CELLSIZE + CELLSIZE/2};
                     DrawLineEx(st, en, 10.0f, DARKGREEN);
                 }
-                else if(checkRow(board, i, j) == 4){
+                else if(checkRow(g->board, i, j) == 4){
                     Vector2 st = {.x = 100 + j*(SC_WIDTH - 100)/COLS, .y = 150 + i*(SC_HEIGHT- 200)/ROWS};
                     Vector2 en = {.x = 100 + (j+3)*(SC_WIDTH - 100)/COLS, .y = 150 + i*(SC_HEIGHT- 200)/ROWS};
                     DrawLineEx(st, en, 10.0f, DARKGREEN);
                 }
-                else if(checkDiag(board, i, j) == 4){
+                else if(checkDiag(g->board, i, j) == 4){
                     Vector2 st = {.x = 100 + j*(SC_WIDTH - 100)/COLS, .y = 150 + i*(SC_HEIGHT- 200)/ROWS};
                     Vector2 en = {.x = 100 + (j+3)*(SC_WIDTH - 100)/COLS, .y = 150 + (i-3)*(SC_HEIGHT- 200)/ROWS};
                     DrawLineEx(st, en, 10.0f, DARKGREEN);
                 }
-                else if(checkDiagb(board, i, j) == 4){
+                else if(checkDiagb(g->board, i, j) == 4){
                     Vector2 st = {.x = 100 + j*(SC_WIDTH - 100)/COLS, .y = 150 + i*(SC_HEIGHT- 200)/ROWS};
                     Vector2 en = {.x = 100 + (j-3)*(SC_WIDTH - 100)/COLS, .y = 150 + (i-3)*(SC_HEIGHT- 200)/ROWS};
                     DrawLineEx(st, en, 10.0f, DARKGREEN);
