@@ -16,6 +16,16 @@ typedef struct{
     int col;
 }position;
 
+typedef struct{
+    GameScreen gamestate;
+    state board[ROWS][COLS];
+    int compscore;
+    int playerscore;
+    int screenHeight;
+    int screenWidth;
+    int max_depth;
+}Game_info;
+
 bool inInterval(int x, int min, int max); // inclusive
 int checkRow(state board[ROWS][COLS], int startRow, int startCol);
 int checkCol(state board[ROWS][COLS], int startRow, int startCol);

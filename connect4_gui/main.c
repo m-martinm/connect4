@@ -3,37 +3,34 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SC_WIDTH 800
-#define SC_HEIGHT 800
-
 typedef enum GameScreen {TITLE, PLAYERTURN, COMPUTERTURN, ENDING} GameScreen;
 
-void titleScreen(GameScreen *gamestate);
+void titleScreen(Game_info *g);
 void renderBoard(state board[ROWS][COLS]);
-void playerTurn(GameScreen *gamestate, state board[ROWS][COLS]);
-void endScreen(GameScreen *gamestate, state board[ROWS][COLS]);
+void playerTurn(Game_info *g);
+void endScreen(Game_info *g);
 void computerTurn(GameScreen *gamestate, state board[ROWS][COLS]);
 void animate(int posX, int posY, state player, state board[ROWS][COLS]);
 void drawScore();
 void drawEnd(state board[ROWS][COLS]);
 
-int COMPSCORE = 0;
-int PLAYERSCORE = 0;
-
 int main(void)
 {
     // Initialization
-    const int screenWidth = SC_WIDTH;
-    const int screenHeight = SC_HEIGHT;
+    Game_info game = {
+        .gamestate = TITLE,
+        .compscore = 0,
+        .playerscore = 0,
+        .screenHeight = 800,
+        .screenWidth = 800,
+    };
+    memset(game.board, 0, ROWS*COLS*sizeof(game.board[0][0]));
+
     Image icon = LoadImage("dep/icon.png");
     
-    InitWindow(screenWidth, screenHeight, "Connect4");
+    InitWindow(game.screenWidth, game.screenHeight, "Connect4");
     SetWindowIcon(icon);
     UnloadImage(icon);
-
-    state board[ROWS][COLS] = {0};
-    board[6][7] = COMP;
-    GameScreen gamestate = TITLE;
 
     SetTargetFPS(60);
 
@@ -41,17 +38,17 @@ int main(void)
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         HideCursor();
-        switch(gamestate){
+        switch(game.gamestate){
             
-            case TITLE: titleScreen(&gamestate);
+            case TITLE: titleScreen(&game);
                 break;
-            case PLAYERTURN: playerTurn(&gamestate, board);
+            case PLAYERTURN: endScreen(&game);
                 break;
-            case COMPUTERTURN: computerTurn(&gamestate, board);
+            case COMPUTERTURN: titleScreen(&game);
                 break;
-            case ENDING: endScreen(&gamestate, board);
+            case ENDING: endScreen(&game);
                 break;
-            default: titleScreen(&gamestate);
+            default: titleScreen(&game);
                 break;
         }
     }
@@ -61,18 +58,18 @@ int main(void)
     return 0;
 }
 
-void titleScreen(GameScreen *gamestate){
+void titleScreen(Game_info *g){
 
     while (!WindowShouldClose()){
         if(IsKeyPressed(KEY_ENTER)){
-            *gamestate = PLAYERTURN;
+            g->gamestate = PLAYERTURN;
             return;
         }
 
         BeginDrawing();
 
             ClearBackground(LIGHTGRAY);
-            DrawText("PRESS [ENTER] TO START", SC_WIDTH/2 - MeasureText("PRESS [ENTER] TO START", 40)/2, SC_HEIGHT/2 - 50, 40, DARKGRAY);
+            DrawText("PRESS [ENTER] TO START", g->screenWidth/2 - MeasureText("PRESS [ENTER] TO START", 40)/2, g->screenHeight/2, 40, DARKGRAY);
             DrawText("\n\n\nRules:\n - You have to connect 4 dots in any way\n - Your dots always fall to the bottom\n - Just [click] on the column to place your circle there", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO START", 40)/2, GetScreenHeight()/2 - 50, 20, DARKGRAY);
 
         EndDrawing();
@@ -80,35 +77,35 @@ void titleScreen(GameScreen *gamestate){
     CloseWindow();
 }
 
-void endScreen(GameScreen *gamestate, state board[ROWS][COLS]){
+void endScreen(Game_info *g){
 
     char text[128];
-    if(win(board) == 1){
+    if(win(g->board) == 1){
         strcpy(text, "PLAYER WON!");
-        PLAYERSCORE++;
+        g->playerscore ++;
     }
-    else if(win(board) == 2){
+    else if(win(g->board) == 2){
         strcpy(text, "COMPUTER WON!");
-        COMPSCORE++;
+        g->compscore++;
     }
-    else if(win(board) == -1){
+    else if(win(g->board) == -1){
         strcpy(text, "DRAW!");;
     }
 
     while (!WindowShouldClose()){
         if(IsKeyPressed(KEY_ENTER)){
-            memset(board, EMPTY, ROWS*COLS*(sizeof(board[0][0])));
-            *gamestate = TITLE;
+            memset(g->board, EMPTY, ROWS*COLS*sizeof(g->board[0][0]));
+            g->gamestate = TITLE;
             return;
         }
 
         BeginDrawing();
 
             ClearBackground(LIGHTGRAY);
-            DrawText(text, GetScreenWidth()/2 - MeasureText(text, 40)/2, 60, 40, DARKGRAY);
-            DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN", 20)/2, 30, 20, DARKGRAY);
-            renderBoard(board);
-            drawEnd(board);
+            DrawText(text, g->screenWidth - MeasureText(text, g->screenHeight/20)/2, g->screenHeight/14, g->screenHeight/20, DARKGRAY);
+            DrawText("PRESS [ENTER] TO PLAY AGAIN", g->screenWidth - MeasureText("PRESS [ENTER] TO PLAY AGAIN", g->screenHeight/40)/2, g->screenHeight/27, g->screenHeight/40, DARKGRAY);
+            renderBoard(g);
+            drawEnd(g);
             drawScore();
 
         EndDrawing();
@@ -116,7 +113,7 @@ void endScreen(GameScreen *gamestate, state board[ROWS][COLS]){
     CloseWindow();
 }
 
-void playerTurn(GameScreen *gamestate, state board[ROWS][COLS]){
+void playerTurn(Game_info *g){
 
     int col = 3;
 
