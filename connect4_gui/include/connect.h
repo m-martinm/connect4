@@ -2,8 +2,20 @@
 #define CONNECT_H
 
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <limits.h>
+
+#define WIN 100
+#define LOSE (-WIN)
 #define ROWS 6
 #define COLS 7
+#define CELLSIZE 100
+#define B_WIDTH (CELLSIZE*COLS)
+#define B_HEIGHT (CELLSIZE*ROWS)
+
+typedef enum {TITLE, PLAYERTURN, COMPUTERTURN, ENDING} GameScreen;
 
 typedef enum{
     EMPTY = 0,
@@ -16,17 +28,27 @@ typedef struct{
     int col;
 }position;
 
-bool inInterval(int x, int min, int max); // inclusive
-int checkRow(state board[ROWS][COLS], int startRow, int startCol);
-int checkCol(state board[ROWS][COLS], int startRow, int startCol);
-int checkDiag(state board[ROWS][COLS], int startRow, int startCol);
-int checkDiagb(state board[ROWS][COLS], int startRow, int startCol);
-int win(state board[ROWS][COLS]);
-bool boardFull(state board[ROWS][COLS]);
-void legalmoves(state board[ROWS][COLS], position moves[COLS]);
-int minmax(state arr[ROWS][COLS], int isMaximizing, int depth, int alpha, int beta);
-position findBestmove(state arr[ROWS][COLS]);
+typedef struct{
+    GameScreen gamestate;
+    state board[ROWS][COLS];
+    int compscore;
+    int playerscore;
+    int screenHeight;
+    int screenWidth;
+    int max_depth;
+}Game_info;
+
+bool inInterval(int x, int min, int max);
+int checkRow(const state board[ROWS][COLS], int startRow, int startCol);
+int checkCol(const state board[ROWS][COLS], int startRow, int startCol);
+int checkDiag(const state board[ROWS][COLS], int startRow, int startCol);
+int checkDiagb(const state board[ROWS][COLS], int startRow, int startCol);
+int win(const state board[ROWS][COLS]);
+bool boardFull(const state board[ROWS][COLS]);
+void legalmoves(const state board[ROWS][COLS], position moves[COLS]);
+int minmax(state arr[ROWS][COLS], int isMaximizing, int depth, int alpha, int beta, int max_depth);
+position findBestmove(state arr[ROWS][COLS], int max_depth);
 void computermove(state arr[ROWS][COLS], position move);
-int newevaluate(state arr[ROWS][COLS]);
+int newevaluate(const state arr[ROWS][COLS]);
 
 #endif
