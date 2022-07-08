@@ -1,20 +1,13 @@
 #include "include/connect.h"
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define ROWS 6
 #define COLS 7
 
-bool inInterval(int x, int min, int max){ // inclusive
-    if(x <= max && x >= min){
-        return true;
-    }
-    return false;
+bool inInterval(int x, int min, int max){
+    return x <= max && x >= min;
 }
 
-int checkCol(state board[ROWS][COLS], int startRow, int startCol){
+int checkCol(const state board[ROWS][COLS], int startRow, int startCol){
     int cnt = 0;
     int i = startRow;
     if (i-3 < 0) return 0;
@@ -25,10 +18,10 @@ int checkCol(state board[ROWS][COLS], int startRow, int startCol){
     return cnt;
 }
 
-int checkRow(state board[ROWS][COLS], int startRow, int startCol){
+int checkRow(const state board[ROWS][COLS], int startRow, int startCol){
     int cnt = 0;
     int i = startCol;
-    if(i+3 > COLS-1) return 0;
+    if(i > COLS-1-3) return 0;
     while(board[startRow][i] == board[startRow][startCol]){
         cnt++;
         i++;
@@ -36,7 +29,7 @@ int checkRow(state board[ROWS][COLS], int startRow, int startCol){
     return cnt;
 }
 
-int checkDiag(state board[ROWS][COLS], int startRow, int startCol){
+int checkDiag(const state board[ROWS][COLS], int startRow, int startCol){
     int cnt = 0;
     int row = startRow;
     int col = startCol;
@@ -49,7 +42,7 @@ int checkDiag(state board[ROWS][COLS], int startRow, int startCol){
     return cnt;
 }
 
-int checkDiagb(state board[ROWS][COLS], int startRow, int startCol){
+int checkDiagb(const state board[ROWS][COLS], int startRow, int startCol){
     int cnt = 0;
     int row = startRow;
     int col = startCol;
@@ -62,7 +55,7 @@ int checkDiagb(state board[ROWS][COLS], int startRow, int startCol){
     return cnt;
 }
 
-bool boardFull(state board[ROWS][COLS]){
+bool boardFull(const state board[ROWS][COLS]){
     for(int i = 0; i < ROWS; i++){
         for(int j = 0; j < COLS; j++){
             if(board[i][j] == EMPTY){
@@ -73,7 +66,7 @@ bool boardFull(state board[ROWS][COLS]){
     return true;
 }
 
-int win(state board[ROWS][COLS]){
+int win(const state board[ROWS][COLS]){
     for(int i = ROWS-1; i >= 0; i--){
         for(int j = 0; j < COLS; j++){
             if(board[i][j] != EMPTY){
@@ -104,16 +97,10 @@ int min(int a, int b){
     else return a;
 }
 
-// win > block enemy > make3s > make 2s
-// win if tmp == 1 || 2 --> ez külön eset rögtön return
-// block enemy: if enemy has 3 in a row and the next one is yours
-// make3s ugyanaz mint eddig
-// make 2s ugyanaz
-
-int newevaluate(state arr[ROWS][COLS]){
+int newevaluate(const state arr[ROWS][COLS]){
     int won = win(arr);
-    if(won == 2) return 100;
-    else if(won == 1) return -100;
+    if(won == 2) return WIN;
+    else if(won == 1) return LOSE;
     else if(won == -1) return 0;
 
     int blockP = 0, threeP = 0, twoP = 0, blockP2 = 0; 
@@ -195,7 +182,7 @@ int newevaluate(state arr[ROWS][COLS]){
     return ret;
 }
 
-void legalmoves(state board[ROWS][COLS], position moves[COLS]){
+void legalmoves(const state board[ROWS][COLS], position moves[COLS]){
     int cnt = 0;
     for(int i = 0; i < COLS; i++){
         for(int j = ROWS-1; j >= 0; j--){
@@ -210,25 +197,24 @@ void legalmoves(state board[ROWS][COLS], position moves[COLS]){
     }
 }
 
-int minmax(state arr[ROWS][COLS], int isMaximizing, int depth, int alpha, int beta){
+int minmax(state arr[ROWS][COLS], int isMaximizing, int depth, int alpha, int beta, int max_depth){
 
     int score = newevaluate(arr);
-    if(score == -100 || score == 100 || depth > 7) return score;
+    if(score == LOSE || score == WIN || depth > max_depth) return score;
     else if(boardFull(arr)) return 0;
 
     position moves[COLS];  
     memset(moves, -1, sizeof(moves));
 
     if(isMaximizing){
-        int best = -10000;
+        int best = INT_MIN;
         legalmoves(arr, moves);
         for(int i = 0; i < COLS; i++){
             if(moves[i].row != -1){
                 arr[moves[i].row][moves[i].col] = COMP;
-                int eval = minmax(arr, 0, depth + 1, alpha, beta);
+                int eval = minmax(arr, 0, depth + 1, alpha, beta, max_depth);
                 best = max(best, eval);
                 arr[moves[i].row][moves[i].col] = EMPTY;
-                // if(eval == 100) return eval;
                 alpha = max(alpha, eval);
                 if(beta <= alpha) break;
             }
@@ -237,15 +223,14 @@ int minmax(state arr[ROWS][COLS], int isMaximizing, int depth, int alpha, int be
         return best - depth;
     }
     else{
-        int best = 10000;
+        int best = INT_MAX;
         legalmoves(arr, moves);
         for(int i = 0; i < COLS; i++){
             if(moves[i].row != -1){
                 arr[moves[i].row][moves[i].col] = PLAYER;
-                int eval = minmax(arr, 1, depth + 1, alpha, beta);
+                int eval = minmax(arr, 1, depth + 1, alpha, beta, max_depth);
                 best = min(best, eval);
                 arr[moves[i].row][moves[i].col] = EMPTY;
-                // if(eval == -100) return eval;
                 beta = min(beta, eval);
                 if(beta <= alpha) break;
             }
@@ -255,8 +240,8 @@ int minmax(state arr[ROWS][COLS], int isMaximizing, int depth, int alpha, int be
     }
 }
 
-position findBestmove(state arr[ROWS][COLS]){
-    int bestVal = -10000;
+position findBestmove(state arr[ROWS][COLS], int max_depth){
+    int bestVal = INT_MIN;
     position bestMove;
     position moves[COLS];
     memset(moves, -1, sizeof(moves));
@@ -265,14 +250,13 @@ position findBestmove(state arr[ROWS][COLS]){
     for(int i = 0; i < COLS; i++){
         if(moves[i].row != -1){
             arr[moves[i].row][moves[i].col] = COMP;
-            int moveVal = minmax(arr, 0, 0, -10000000, 10000000);
+            int moveVal = minmax(arr, 0, 0, INT_MIN, INT_MAX, max_depth);
             if(moveVal > bestVal){
                 bestMove.row = moves[i].row;
                 bestMove.col = moves[i].col;
                 bestVal = moveVal;
             }
             arr[moves[i].row][moves[i].col] = EMPTY;
-            // if(bestVal == 100) return  bestMove;
         } 
     }
     return bestMove;
