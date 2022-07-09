@@ -265,5 +265,3 @@ position findBestmove(state arr[ROWS][COLS], int max_depth){
 void computermove(state arr[ROWS][COLS], position move){
     arr[move.row][move.col] = COMP;
 }
-
-

@@ -9,14 +9,16 @@ void computerTurn(Game_info *g);
 void animate(int posX, int posY, state player, const Game_info *g);
 void drawScore(const Game_info *g);
 void drawEnd(const Game_info *g);
+void SettingsScreen(Game_info *g);
+void DrawSettings(const Game_info *g);
+
 int game_play(Game_info *g);
-void HideMouse();
 
 int main(int argc, char **argv){
 
     // Initialization
     Game_info game = {
-        .gamestate = TITLE,
+        .gamestate = SETTINGS,
         .compscore = 0,
         .playerscore = 0,
         .screenHeight = 800,
@@ -45,7 +47,9 @@ int game_play(Game_info *g){
         g->screenWidth = GetScreenWidth();
         g->screenHeight = GetScreenHeight();
         switch(g->gamestate){
-            
+
+            case SETTINGS: SettingsScreen(g);
+                break;
             case TITLE: titleScreen(g);
                 break;
             case PLAYERTURN: playerTurn(g);
@@ -65,7 +69,6 @@ int game_play(Game_info *g){
 void titleScreen(Game_info *g){
 
     while (!WindowShouldClose()){
-        HideMouse();
         if(IsKeyPressed(KEY_Q)) MaximizeWindow();
         g->screenWidth = GetScreenWidth();
         g->screenHeight = GetScreenHeight();
@@ -102,13 +105,12 @@ void endScreen(Game_info *g){
     }
 
     while (!WindowShouldClose()){
-        HideMouse();
         if(IsKeyPressed(KEY_Q)) MaximizeWindow();
         g->screenWidth = GetScreenWidth();
         g->screenHeight = GetScreenHeight();
         if(IsKeyPressed(KEY_ENTER)){
             memset(g->board, EMPTY, ROWS*COLS*sizeof(g->board[0][0]));
-            g->gamestate = TITLE;
+            g->gamestate = SETTINGS;
             return;
         }
 
@@ -133,7 +135,6 @@ void playerTurn(Game_info *g){
     int col = 3;
 
     while (!WindowShouldClose()){
-        HideMouse();
         if(IsKeyPressed(KEY_Q)) MaximizeWindow();
         g->screenWidth = GetScreenWidth();
         g->screenHeight = GetScreenHeight();
@@ -178,7 +179,6 @@ void playerTurn(Game_info *g){
 }
 
 void computerTurn(Game_info *g){
-    HideMouse();
     if(IsKeyPressed(KEY_Q)) MaximizeWindow();
     g->screenWidth = GetScreenWidth();
     g->screenHeight = GetScreenHeight();
@@ -246,12 +246,11 @@ void drawScore(const Game_info *g){
     char cscore[10];
     itoa(g->playerscore, pscore, 10);
     itoa(g->compscore, cscore, 10);
-    DrawText(pscore, 30, 30, 40, BLACK); // itt ezeket javítsd
+    DrawText(pscore, 30, 30, 40, BLACK);
     DrawText(cscore, g->screenWidth - 30 - MeasureText(cscore, 40), 30, 40, BLACK);
 }
 
 
-// continue here
 void drawEnd(const Game_info *g){
     for(int i = ROWS-1; i >=0; i--){
         for(int j = 0; j < COLS; j++){
@@ -281,7 +280,38 @@ void drawEnd(const Game_info *g){
     }
 }
 
-void HideMouse(){
-    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !(IsCursorHidden())) HideCursor();
-    else if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && IsCursorHidden()) ShowCursor();
+void SettingsScreen(Game_info *g){
+    Vector2 mouse;
+    while (!WindowShouldClose())
+    {
+        mouse = GetMousePosition();
+        if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+            if(inInterval(mouse.y, CELLSIZE, CELLSIZE+BOXSIZE) && inInterval(g->max_depth, 1, 14)){
+                if(inInterval(mouse.x, BOX1_X, BOX1_X + BOXSIZE)) g->max_depth--;
+                else if(inInterval(mouse.x, BOX2_X, BOX2_X + BOXSIZE)) g->max_depth++;
+            }
+        }
+        if(IsKeyPressed(KEY_SPACE)){
+            g->gamestate = TITLE;
+            return;
+        }
+        DrawSettings(g);
+    }    
+}
+
+void DrawSettings(const Game_info *g){
+    char depth_buffer[128] = "AI seach Depth: ";
+    char depth[8];
+    itoa(g->max_depth, depth, 10);
+    strcat(depth_buffer, depth);
+    BeginDrawing();
+    ClearBackground(LIGHTGRAY);
+        DrawText(depth_buffer, g->screenWidth/2-MeasureText(depth_buffer, 30), CELLSIZE, 30, DARKGRAY);
+        Rectangle depth_box[2] = {
+            {.width = BOXSIZE, .height = BOXSIZE, .x = g->screenWidth/2 + CELLSIZE, CELLSIZE},
+            {.width = BOXSIZE, .height = BOXSIZE, .x = g->screenWidth/2 + CELLSIZE+2*BOXSIZE, CELLSIZE}
+        };
+        DrawRectangleRec(depth_box[0], MAROON);
+        DrawRectangleRec(depth_box[1], DARKGREEN);
+    EndDrawing();
 }

@@ -14,8 +14,11 @@
 #define CELLSIZE 100
 #define B_WIDTH (CELLSIZE*COLS)
 #define B_HEIGHT (CELLSIZE*ROWS)
+#define BOXSIZE 30
+#define BOX1_X (g->screenWidth/2 + CELLSIZE)
+#define BOX2_X (g->screenWidth/2 + CELLSIZE+2*BOXSIZE)
 
-typedef enum {TITLE, PLAYERTURN, COMPUTERTURN, ENDING} GameScreen;
+typedef enum {TITLE, PLAYERTURN, COMPUTERTURN, ENDING, SETTINGS} GameScreen;
 
 typedef enum{
     EMPTY = 0,
