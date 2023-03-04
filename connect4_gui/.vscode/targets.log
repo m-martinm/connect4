@@ -1,4 +1,309 @@
 make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --question
-'make.exe' is not recognized as an internal or external command,
-operable program or batch file.
+make: *** No rule to make target 'all'.  Stop.
 
+# GNU Make 4.3
+# Built for x86_64-pc-msys
+# Copyright (C) 1988-2020 Free Software Foundation, Inc.
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+ 
+
+# Make data base, printed on Tue Feb 28 17:49:20 2023
+
+# Variables
+
+# environment
+FPS_BROWSER_APP_PROFILE_STRING = Internet Explorer
+# environment
+SYSTEMDRIVE = C:
+# environment
+LC_ALL = C
+# environment
+POSH_THEME = C:\Users\Martin\gruvbox.omp.json
+# environment
+USERPROFILE = C:\Users\Martin
+# environment
+LOCALAPPDATA = C:\Users\Martin\AppData\Local
+# environment
+VSCODE_CWD = C:\Users\Martin\GitHub\connect4\connect4_gui
+# environment
+SYSTEMROOT = C:\WINDOWS
+# environment
+PROCESSOR_LEVEL = 6
+# environment
+PSMODULEPATH = C:\Users\Martin\Documents\WindowsPowerShell\Modules;C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
+# default
+MAKE_COMMAND := make
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# environment
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\LOCAL\crashpad_1124_WWJVBHZTZOPMZFBU
+ 
+# environment
+FPS_BROWSER_USER_PROFILE_STRING = Default
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# default
+.VARIABLES := 
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+ 
+# automatic
+%F = $(notdir $%)
+# environment
+CONDA_PROMPT_MODIFIER = False
+# environment
+VSCODE_CODE_CACHE_PATH = C:\Users\Martin\AppData\Roaming\Code\CachedData\97dec172d3256f8ca4bfb2143f3f76b503ca0534
+# environment
+LANG = C
+# default
+.LOADED := 
+# environment
+TMP = /c/Users/Martin/AppData/Local/Temp
+# default
+.INCLUDE_DIRS = /usr/include /usr/include
+# makefile
+MAKEFLAGS = pqrR
+# environment
+ONEDRIVE = C:\Users\Martin\OneDrive
+# makefile
+CURDIR := /c/Users/Martin/GitHub/connect4/connect4_gui
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+# environment
+POWERLINE_COMMAND = oh-my-posh
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+PROGRAMFILES = C:\Program Files
+# environment
+MFLAGS = -pqrR
+# default
+.SHELLFLAGS := -c
+# environment
+!C: = c:\Users\Martin\GitHub\connect4\connect4_gui
+# environment
+COMMONPROGRAMW6432 = C:\Program Files\Common Files
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# makefile (from 'makefile', line 1)
+MAKEFILE_LIST := makefile
+# automatic
+@F = $(notdir $@)
+# environment
+VSCODE_PID = 1124
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# environment
+POSH_AZURE_ENABLED = False
+# environment
+POSH_THEMES_PATH = C:\Users\Martin\AppData\Local\Programs\oh-my-posh\themes
+# automatic
+*F = $(notdir $*)
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# environment
+VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
+# environment
+POSH_GIT_ENABLED = False
+# default
+MAKE_HOST := x86_64-pc-msys
+# environment
+PROGRAMDATA = C:\ProgramData
+# default
+ 
+SHELL := /bin/sh
+# environment
+HOMEPATH = \Users\Martin
+# default
+MAKECMDGOALS := all
+# environment
+DRIVERDATA = C:\Windows\System32\Drivers\DriverData
+# environment
+COMSPEC = C:\WINDOWS\system32\cmd.exe
+# environment
+WINDIR = C:\WINDOWS
+# environment
+MAKELEVEL := 0
+# default
+MAKE = $(MAKE_COMMAND)
+# environment
+PATH = /c/Program Files/Common Files/Oracle/Java/javapath:/c/WINDOWS/system32:/c/WINDOWS:/c/WINDOWS/System32/Wbem:/c/WINDOWS/System32/WindowsPowerShell/v1.0:/c/WINDOWS/System32/OpenSSH:/c/Program Files/Microsoft VS Code/bin:/c/Program Files/CMake/bin:/c/Program Files/MATLAB/R2022b/bin:/c/Users/Martin/AppData/Local/Programs/Python/Python310/Scripts:/c/Users/Martin/AppData/Local/Programs/Python/Python310:/c/Users/Martin/AppData/Local/Microsoft/WindowsApps:/mingw64/bin:/usr/bin/make.exe:/c/Users/Martin/AppData/Local/GitHubDesktop/bin:/c/Users/Martin/AppData/Local/Programs/oh-my-posh/bin:/c/Program Files/Neovim/bin:/usr/bin:/c/Program Files/Java/jdk-17.0.5/bin:/c/Users/Martin/AppData/Local/Programs/MiKTeX/miktex/bin/x64:/c/Program Files (x86)/VHDL-Tool/VHDL-Tool 1.0
+# environment
+COMPUTERNAME = LENOVO
+# default
+MAKEFILES := 
+# automatic
+^F = $(notdir $^)
+# environment
+PROMPT = $P$G
+# environment
+LOGONSERVER = \\LENOVO
+# environment
+USERNAME = Martin
+# environment
+COMMONPROGRAMFILES = C:\Program Files\Common Files
+# automatic
+?F = $(notdir $?)
+# environment
+PROGRAMW6432 = C:\Program Files
+# environment
+PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL
+# automatic
++F = $(notdir $+)
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# environment
+USERDOMAIN = LENOVO
+# 'override' directive
+GNUMAKEFLAGS := 
+# environment
+OS = Windows_NT
+# makefile
+.DEFAULT_GOAL := game
+# default
+MAKE_VERSION := 4.3
+# environment
+PROGRAMFILES(X86) = C:\Program Files (x86)
+# environment
+USERDOMAIN_ROAMINGPROFILE = LENOVO
+# environment
+NUMBER_OF_PROCESSORS = 4
+# environment
+PUBLIC = C:\Users\Public
+# environment
+MOZ_PLUGIN_PATH = C:\Program Files (x86)\Foxit Software\Foxit PDF Reader\plugins\
+# environment
+APPDATA = C:\Users\Martin\AppData\Roaming
+# makefile (from 'makefile', line 2)
+CFLAGS = -Wall -std=c99 -Wno-missing-braces
+# environment
+HOMEDRIVE = C:
+# environment
+PROCESSOR_ARCHITECTURE = AMD64
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
+HOME = /home/Martin
+# environment
+COMMONPROGRAMFILES(X86) = C:\Program Files (x86)\Common Files
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# environment
+TEMP = /c/Users/Martin/AppData/Local/Temp
+# environment
+VSCODE_IPC_HOOK = \\.\pipe\642c2d617ef439126db0f09671fdff93-1.74.3-main-sock
+# environment
+TERM = xterm-256color
+# default
+.RECIPEPREFIX := 
+# automatic
+<F = $(notdir $<)
+# default
+SUFFIXES := 
+# environment
+ALLUSERSPROFILE = C:\ProgramData
+# environment
+SESSIONNAME = Console
+# environment
+VSCODE_CLI = 1
+# environment
+ELECTRON_NO_ATTACH_CONSOLE = 1
+# default
+ 
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync check-symlink load
+# environment
+ 
+PROCESSOR_REVISION = 3d04
+ 
+# makefile (from 'makefile', line 1)
+CC = gcc
+# environment
+PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 61 Stepping 4, GenuineIntel
+# variable set hash-table stats:
+# Load=102/1024=10%, Rehash=0, Collisions=12/129=9%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# . (device 1480417421, inode 9851624184962528): 11 files, no impossibilities.
+
+# 11 files, no impossibilities in 1 directories.
+
+# Implicit Rules
+
+# No implicit rules.
+
+# Files
+
+game: main.c
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 6):
+	$(CC) main.c connect.c -o connect4.exe $(CFLAGS) -I include/ -L lib/ -lraylib -lopengl32 -lgdi32 -lwinmm
+
+# Not a target:
+test.c:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+all:
+#  Command line target.
+ 
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has not been updated.
+
+# Not a target:
+main.c:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+test: test.c
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 9):
+	$(CC) test.c connect.c -o test.exe $(CFLAGS) -I include/ -L lib/ -lraylib -lopengl32 -lgdi32 -lwinmm
+
+# Not a target:
+makefile:
+#  Implicit rule search has been done.
+#  Last modified 2022-07-08 11:12:04.1647671
+#  File has been updated.
+#  Successfully updated.
+
+# files hash-table stats:
+# Load=8/1024=1%, Rehash=0, Collisions=0/20=0%
+# VPATH Search Paths
+
+# No 'vpath' search paths.
+
+# No general ('VPATH' variable) search path.
+
+# strcache buffers: 1 (0) / strings = 17 / storage = 121 B / avg = 7 B
+ 
+# current buf: size = 8162 B / used = 121 B / count = 17 / avg = 7 B
+
+# strcache performance: lookups = 25 / hit rate = 32%
+# hash-table stats:
+# Load=17/8192=0%, Rehash=0, Collisions=0/25=0%
+# Finished Make data base on Tue Feb 28 17:49:20 2023
+
+ 

@@ -1,4 +1,5 @@
 make.exe --dry-run --always-make --keep-going --print-directory
-'make.exe' is not recognized as an internal or external command,
-operable program or batch file.
-
+make: Entering directory '/c/Users/Martin/GitHub/connect4/connect4_gui'
+gcc main.c connect.c -o connect4.exe -Wall -std=c99 -Wno-missing-braces -I include/ -L lib/ -lraylib -lopengl32 -lgdi32 -lwinmm
+make: Leaving directory '/c/Users/Martin/GitHub/connect4/connect4_gui'
+ 
